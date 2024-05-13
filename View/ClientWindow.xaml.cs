@@ -20,10 +20,10 @@ namespace Messenger
     /// </summary>
     public partial class ClientWindow : Window
     {
-        public ClientWindow()
+        public ClientWindow(string name, string ip)
         {
             InitializeComponent();
-            DataContext = new ClientViewModel();
+            DataContext = new ClientViewModel(name, ip);
         }
     }
 }

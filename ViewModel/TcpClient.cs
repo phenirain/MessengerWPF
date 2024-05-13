@@ -40,28 +40,8 @@ namespace Messenger
                 await server.ReceiveAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
                 var sortByte = bytes.Where(item => item != 0).ToArray();
                 var message = Encoding.UTF8.GetString(sortByte);
-                Messages.Add(message);
-                //if (message.Substring(0, 5) != "/logs" && message != "/disconnect")
-                //{
-                //    Message.Add(Encoding.UTF8.GetString(bytes));
-                //}
-                //else if (message == "/disconnect")
-                //{
-                //    if (_viewModel.GetType() == typeof(ServerViewModel))
-                //        (_viewModel as ServerViewModel).CloseWindow();
-                //    else
-                //        (_viewModel as ClientViewModel).CloseWindow();
-                //}
-                //else
-                //{
-                //    var obs = new ObservableCollection<string>(message.Split('\n'));
-                //    obs.RemoveAt(0);
-                //    Users.Clear();
-                //    foreach (var item in obs)
-                //    {
-                //        Users.Add(item);
-                //    }
-                //}
+                if (!message.Contains("user")) Messages.Add(message);
+                else Users = new ObservableCollection<string>(message.Split(':')[1].Split('/'));
             }
 
             server.Close();

@@ -41,6 +41,7 @@ namespace Messenger.ViewModel
             server = new TcpServer();
             client = new TcpClient(name, "127.0.0.1");
             Messages = client.Messages;
+            UsersOrLogs = client.Users;
         }
 
         public void Switch(object sender, RoutedEventArgs e)

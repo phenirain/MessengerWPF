@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Messenger.Model;
+using System.Configuration;
 
 namespace Messenger
 {
@@ -15,8 +16,7 @@ namespace Messenger
     {
         public readonly Socket socket;
         public Dictionary<Client, CancellationTokenSource> Clients = new Dictionary<Client, CancellationTokenSource>();
-        //public ObservableCollection<string> ExtendedLogs = new();
-        //public ObservableCollection<string> Logs = new();
+        public ObservableCollection<string> Logs = new ObservableCollection<string>();
         public CancellationTokenSource MainToken;
 
         public TcpServer()
@@ -43,55 +43,38 @@ namespace Messenger
                 {
                     var client = new Client(clientSocket, name);
                     Clients.Add(client, new CancellationTokenSource());
-                    //Logs.Add(client.name);
-                    //ExtendedLogs.Add($"{client.name} - подключился\n{DateTime.Now.ToString()}");
-                    //await SendLogsToClient();
-                    ReceiveMessage(client.socket, Clients[client].Token);
+                    string users = "user:";
+                    foreach (var item in Clients.Keys) users += $"{item.name.ToString()}/";
+                    SendMessage(clientSocket, users);
+                    Logs.Add($"{client.name} - подключился\n{DateTime.Now.ToString()}");
+                    ReceiveMessage(client, Clients[client].Token);
                 }
-                //else
-                //{
-                //    await MailingMessage("/disconnect");
-                //}
             }
         }
 
-        private async Task ReceiveMessage(Socket client, CancellationToken token)
+        private async Task ReceiveMessage(Client client, CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
                 var bytes = new byte[1024];
-                //await client.SocketClient.ReceiveAsync(bytes, SocketFlags.None);
-                await client.ReceiveAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
+                await client.socket.ReceiveAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
                 var sortByte = bytes?.Where(x => x != 0).ToArray();
                 var message = Encoding.UTF8.GetString(sortByte);
-                SendMessage(client, message);
                 if (message == "/disconnect")
                     Clients[client].Cancel();
-                else
-                    await MailingMessage($"[{DateTime.Now.ToString()}][{client.Name}]: {message}");
+                SendMessage(client.socket, $"{client.name}: {DateTime.Now.ToString()} - {message}");
             }
 
-            //Clients.Remove(client);
-            //Logs.Remove(client.Name);
-            //ExtendedLogs.Add($"{client.Name} - отключился\n{DateTime.Now.ToString()}");
-            //await SendLogsToClient();
+            Clients.Remove(client);
+            Logs.Add($"{client.name} - отключился\n{DateTime.Now.ToString()}");
         }
 
-        //private async Task SendLogsToClient()
-        //{
-        //    var logsString = "/logs\n" + string.Join("\n", Logs);
-        //    await MailingMessage(logsString);
-        //}
 
         private async Task SendMessage(Socket client, string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
-            await client.SendAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
+            foreach (var item in Clients.Keys) await item.socket.SendAsync(new ArraySegment<byte>(bytes), SocketFlags.None);
         }
 
-        //private async Task MailingMessage(string message)
-        //{
-        //    foreach (var item in Clients.Keys) await SendMessage(item, message);
-        //}
     }
 }

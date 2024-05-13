@@ -11,7 +11,10 @@ namespace Messenger.ViewModel
     internal class ClientViewModel
     {
         private ObservableCollection<string> messages;
-        public ObservableCollection<string> Messages;
+        public ObservableCollection<string> Messages
+        {
+            get => messages; set => messages = value;
+        }
 
         private ObservableCollection<string> users;
         public ObservableCollection<string> Users
@@ -25,9 +28,13 @@ namespace Messenger.ViewModel
             get => message; set => message = value;
         }
 
-        public ClientViewModel() 
+        private TcpClient client;
+
+        public ClientViewModel(string name, string ip) 
         {
-        
+            client = new TcpClient(name, ip);
+            Messages = client.Messages;
+            Users = client.Users;
         }
 
         public void Exit(object sender, RoutedEventArgs e)
@@ -35,9 +42,10 @@ namespace Messenger.ViewModel
 
         }
 
-        public void Send(object sender, RoutedEventArgs e)
+        public async void Send(object sender, RoutedEventArgs e)
         {
-
+            await client.SendMessage(Message);
+            Message = "";
         }
     }
 }

@@ -51,19 +51,23 @@ namespace Messenger
                     {
                         var ping = new Ping();
                         reply = ping.Send(Ip);
+                        if (reply.Status == IPStatus.TimedOut)
+                        {
+                            throw new Exception();
+                        }
                     }
                 }
-                catch
+                catch (Exception)
                 {
                     MessageBox.Show("Неизвестный IP");
                     return;
                 }
-                ClientWindow w = new ClientWindow();
+                ClientWindow w = new ClientWindow(Nick, Ip);
                 w.Show();
             } else
             {
-                if (!string.IsNullOrEmpty(Nick)) MessageBox.Show("Имя должно быть заполнено");
-                else if (!string.IsNullOrEmpty(Ip)) MessageBox.Show("IP должно быть заполнено");
+                if (string.IsNullOrEmpty(Nick)) MessageBox.Show("Имя должно быть заполнено");
+                else if (string.IsNullOrEmpty(Ip)) MessageBox.Show("IP должно быть заполнено");
             }
         }
     }
