@@ -62,6 +62,11 @@ namespace Messenger
                     MessageBox.Show("Неизвестный IP");
                     return;
                 }
+                if (TcpServer.Clients.Keys.ToList().Where(x => x.name == Nick).Any())
+                {
+                    MessageBox.Show("К сожалению человек с таким никнеймом уже в беседе");
+                    return;
+                } 
                 ClientWindow w = new ClientWindow(Nick, Ip);
                 w.Show();
             } else

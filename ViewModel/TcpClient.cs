@@ -41,7 +41,12 @@ namespace Messenger
                 var sortByte = bytes.Where(item => item != 0).ToArray();
                 var message = Encoding.UTF8.GetString(sortByte);
                 if (!message.Contains("user")) Messages.Add(message);
-                else Users = new ObservableCollection<string>(message.Split(':')[1].Split('/'));
+                else {
+                    foreach (var item in (message.Split(':')[1].Split('/')))
+                    {
+                        if (!Users.Contains(item) && item != "") Users.Add(item);
+                    }
+                }
             }
 
             server.Close();

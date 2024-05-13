@@ -15,7 +15,7 @@ namespace Messenger
     public class TcpServer
     {
         public readonly Socket socket;
-        public Dictionary<Client, CancellationTokenSource> Clients = new Dictionary<Client, CancellationTokenSource>();
+        public static Dictionary<Client, CancellationTokenSource> Clients = new Dictionary<Client, CancellationTokenSource>();
         public ObservableCollection<string> Logs = new ObservableCollection<string>();
         public CancellationTokenSource MainToken;
 
